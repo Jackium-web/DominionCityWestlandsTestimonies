@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonies of Faith</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: #4b5563;
+        }
+
+        .show-message {
+            animation: showMessage 0.5s ease-in-out forwards;
+        }
+
+        @keyframes showMessage {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-5xl h-auto md:h-[80vh] bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
+
+        <!-- Left Panel: Video Background & Title -->
+        <div class="md:w-2/5 p-8 flex flex-col justify-between text-white relative overflow-hidden">
+            <!-- Video Background -->
+            <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
+                <!-- Placeholder video URL. Replace with your actual video source. -->
+                <source src="WhatsApp Video 2025-09-24 at 11.13.36 PM.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <!-- Overlay to make text readable -->
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-800/80 to-purple-800/80 z-10"></div>
+            
+            <div class="relative z-20">
+                <h1 class="text-4xl lg:text-5xl font-extrabold mb-4 drop-shadow-md">Share Your Story</h1>
+                <p class="text-lg font-light">
+                    Your testimony is a powerful beacon of hope and a testament to God's grace. Share how He has moved in your life with our community.
+                </p>
+            </div>
+            <div class="relative z-20 mt-auto">
+                <p class="text-xs opacity-70 mt-4">&copy; 2024 Dominion City Westlands. All Rights Reserved.</p>
+            </div>
+        </div>
+
+        <!-- Right Panel: Form -->
+        <div class="md:w-3/5 p-6 md:p-10 flex flex-col overflow-hidden">
+            <h2 class="text-3xl font-bold mb-6 text-gray-800 text-center">Write Your Testimony</h2>
+            
+            <!-- Testimony Form -->
+            <form id="waForm" class="space-y-4 mb-8">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Your Name (Optional)</label>
+                    <input type="text" id="name" name="name" placeholder="John Doe" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 ease-in-out">
+                </div>
+                <div>
+                    <label for="testimony" class="block text-sm font-medium text-gray-700">Your Testimony <span class="text-red-500">*</span></label>
+                    <textarea id="testimony" name="testimony" rows="4" required placeholder="Type your story here..." class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 ease-in-out"></textarea>
+                </div>
+                <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out transform hover:scale-105">
+                    Share My Testimony
+                </button>
+                <div id="messageBox" class="hidden p-4 mt-4 rounded-lg text-sm font-medium text-center" role="alert"></div>
+            </form>
+
+            <p id="status"></p>
+        </div>
+    </div>
+
+    <script>
+
+        document.getElementById("waForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            const res = await fetch("/api/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+            document.getElementById("status").textContent = result.message;
+        });
+
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageBox = document.getElementById('messageBox');
+
+            document.getElementById('testimonyForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value || 'Anonymous';
+                const testimony = document.getElementById('testimony').value;
+
+                if (testimony.trim() === '') {
+                    showMessage('Please write your testimony before submitting.', 'bg-red-100 text-red-700 border-red-200');
+                    return;
+                }
+
+                // Simulate form submission
+                console.log('Name:', name);
+                console.log('Testimony:', testimony);
+                
+                // Clear the form
+                document.getElementById('testimonyForm').reset();
+
+                // Show success message
+                showMessage('Thank you for sharing your testimony! It has been submitted successfully.', 'bg-green-100 text-green-700 border-green-200');
+            });
+
+            // Function to show a message in the message box
+            function showMessage(message, classes) {
+                messageBox.textContent = message;
+                messageBox.className = classes + ' p-4 mt-4 rounded-lg text-sm font-medium text-center show-message';
+                messageBox.classList.remove('hidden');
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 5000); // Hide after 5 seconds
+            }
+        });
+    </script>
+
+    <script src="/main.js"></script>
+</body>
+</html>
