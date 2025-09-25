@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testimonies of Faith</title>
-    <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -13,58 +12,12 @@
             background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
             color: #4b5563;
         }
-
         .show-message {
             animation: showMessage 0.5s ease-in-out forwards;
         }
-
         @keyframes showMessage {
             from { opacity: 0; transform: translateY(-100%); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Modal styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 50;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            transform: scale(0.9);
-            opacity: 0;
-            animation: popIn 0.3s forwards cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-
-        @keyframes popIn {
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #6d28d9;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -82,7 +35,7 @@
         <div class="md:w-2/5 p-8 flex flex-col justify-between text-white relative overflow-hidden">
             <!-- Video Background -->
             <video autoplay loop muted playsinline class="absolute inset-0 w-full h-full object-cover z-0">
-                <source src="ChurchVideo.mp4" type="video/mp4">
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-flying-through-the-clouds-4424-large.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
             <!-- Overlay to make text readable -->
@@ -112,33 +65,8 @@
                 
                 <!-- Text Area for Testimony -->
                 <div>
-                    <label for="textTestimony" class="block text-sm font-medium text-gray-700">Your Written Testimony (Optional)</label>
+                    <label for="textTestimony" class="block text-sm font-medium text-gray-700">Your Written Testimony</label>
                     <textarea id="textTestimony" name="textTestimony" rows="4" placeholder="Type your story here..." class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 ease-in-out"></textarea>
-                </div>
-
-                <!-- Audio Input Button -->
-                <div id="audioInputContainer" class="flex items-center justify-center">
-                    <button type="button" id="audioButton" class="inline-flex items-center px-6 py-3 border-2 border-purple-400 text-sm font-medium rounded-full text-purple-600 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out transform hover:scale-105 shadow-md">
-                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.5-3c0 3.53-2.64 6.44-6.2 6.93V21h-1.6c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-1.6v-3.07C9.14 17.44 6.5 14.53 6.5 11h2c0 2.22 1.78 4 4 4s4-1.78 4-4h2.5z"/>
-                        </svg>
-                        Record Audio Testimony
-                    </button>
-                </div>
-
-                <!-- Audio File Indicator -->
-                <div id="audioFileIndicator" class="hidden flex items-center justify-between p-4 bg-purple-100 rounded-xl shadow-inner border border-purple-200">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-6 w-6 text-purple-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 3a9 9 0 00-9 9v1a1 1 0 001 1h16a1 1 0 001-1v-1a9 9 0 00-9-9zM4.5 14.5a.5.5 0 11-.5-.5.5.5 0 01.5.5zm15-.5a.5.5 0 11.5.5.5.5 0 01-.5-.5z"/>
-                        </svg>
-                        <span class="text-sm font-medium text-purple-800">Audio Testimony Ready!</span>
-                    </div>
-                    <button type="button" id="removeAudio" class="text-gray-400 hover:text-red-500 transition-colors">
-                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm3.707 13.707a1 1 0 01-1.414 0L12 13.414l-2.293 2.293a1 1 0 01-1.414-1.414L10.586 12 8.293 9.707a1 1 0 011.414-1.414L12 10.586l2.293-2.293a1 1 0 011.414 1.414L13.414 12l2.293 2.293a1 1 0 010 1.414z"/>
-                        </svg>
-                    </button>
                 </div>
 
                 <!-- Submit Button -->
@@ -149,229 +77,60 @@
         </div>
     </div>
 
-    <!-- Audio Recording Modal -->
-    <div id="audioModal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <!-- Recording State -->
-            <div id="recordingState" class="flex flex-col items-center">
-                <svg class="h-16 w-16 text-purple-600 mb-4 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.5-3c0 3.53-2.64 6.44-6.2 6.93V21h-1.6c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-1.6v-3.07C9.14 17.44 6.5 14.53 6.5 11h2c0 2.22 1.78 4 4 4s4-1.78 4-4h2.5z"/>
-                </svg>
-                <p id="recordingStatus" class="text-xl font-semibold text-gray-800 mb-6">Listening...</p>
-                <button id="stopRecording" class="px-6 py-3 text-lg font-medium rounded-full text-white bg-red-600 hover:bg-red-700 transition duration-150 ease-in-out transform hover:scale-105 shadow-lg">
-                    Stop
-                </button>
-            </div>
-
-            <!-- Playback State -->
-            <div id="playbackState" class="hidden flex-col items-center">
-                <p class="text-xl font-semibold text-gray-800 mb-4">Your Recording</p>
-                <audio id="audioPlayback" controls class="mb-4 w-full"></audio>
-                <div class="flex space-x-4">
-                    <button id="discardRecording" class="px-6 py-3 text-sm font-medium rounded-full text-gray-600 bg-gray-200 hover:bg-gray-300 transition duration-150 ease-in-out shadow-lg">
-                        Discard
-                    </button>
-                    <button id="saveRecording" class="px-6 py-3 text-sm font-medium rounded-full text-white bg-purple-600 hover:bg-purple-700 transition duration-150 ease-in-out transform hover:scale-105 shadow-lg">
-                        Save
-                    </button>
-                </div>
-            </div>
-
-            <!-- Loading State -->
-            <div id="loadingState" class="hidden flex-col items-center">
-                <div class="spinner mb-4"></div>
-                <p class="text-xl font-semibold text-gray-800">Uploading...</p>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
-    document.addEventListener('DOMContentLoaded', async () => {
-        const messageBoxContainer = document.getElementById('messageBox');
-        const messageBox = messageBoxContainer.querySelector('div');
-        const audioButton = document.getElementById('audioButton');
-        const audioModal = document.getElementById('audioModal');
-        const recordingState = document.getElementById('recordingState');
-        const playbackState = document.getElementById('playbackState');
-        const loadingState = document.getElementById('loadingState');
-        const stopRecordingButton = document.getElementById('stopRecording');
-        const discardRecordingButton = document.getElementById('discardRecording');
-        const saveRecordingButton = document.getElementById('saveRecording');
-        const audioPlayback = document.getElementById('audioPlayback');
-        const audioFileIndicator = document.getElementById('audioFileIndicator');
-        const removeAudioButton = document.getElementById('removeAudio');
-        const audioInputContainer = document.getElementById('audioInputContainer');
-        const nameInput = document.getElementById('name');
-        const textTestimonyInput = document.getElementById('textTestimony');
-        const testimonyForm = document.getElementById('testimonyForm');
-        
-        let mediaRecorder;
-        let audioChunks = [];
-        let audioBlob = null;
-        let uploadedAudioUrl = null;
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageBoxContainer = document.getElementById('messageBox');
+            const messageBox = messageBoxContainer.querySelector('div');
+            const nameInput = document.getElementById('name');
+            const textTestimonyInput = document.getElementById('textTestimony');
+            const testimonyForm = document.getElementById('testimonyForm');
+            
+            // Function to show a message at the top of the screen
+            function showMessage(message, type) {
+                let classes = '';
+                if (type === 'success') {
+                    classes = 'bg-green-100 text-green-700 border-green-200';
+                } else if (type === 'error') {
+                    classes = 'bg-red-100 text-red-700 border-red-200';
+                } else if (type === 'warning') {
+                    classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
+                }
 
-        // ✅ Show message
-        function showMessage(message, type) {
-            let classes = '';
-            if (type === 'success') {
-                classes = 'bg-green-100 text-green-700 border-green-200';
-            } else if (type === 'error') {
-                classes = 'bg-red-100 text-red-700 border-red-200';
-            } else if (type === 'warning') {
-                classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
+                messageBox.textContent = message;
+                messageBox.className = classes + ' px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto';
+                messageBoxContainer.classList.remove('-translate-y-full');
             }
 
-            messageBox.textContent = message;
-            messageBox.className = classes + ' px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto';
-            messageBoxContainer.classList.remove('-translate-y-full');
-        }
-
-        function hideMessage() {
-            messageBoxContainer.classList.add('-translate-y-full');
-        }
-
-        // ✅ Audio recording logic
-        audioButton.addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                audioBlob = null;
-                uploadedAudioUrl = null;
+            // Function to hide the message box
+            function hideMessage() {
+                messageBoxContainer.classList.add('-translate-y-full');
+            }
+            
+            // Form submission logic
+            testimonyForm.addEventListener('submit', function(e) {
+                e.preventDefault();
                 hideMessage();
 
-                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-                mediaRecorder.onstop = () => {
-                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPlayback.src = audioUrl;
-
-                    // Switch to playback state
-                    recordingState.classList.add('hidden');
-                    playbackState.classList.remove('hidden');
-                    playbackState.classList.add('flex');
-                };
-
-                mediaRecorder.start();
-                audioModal.classList.remove('hidden');
-            } catch (error) {
-                console.error('Microphone error:', error);
-                showMessage('Microphone access denied.', 'error');
-            }
-        });
-
-        stopRecordingButton.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-        });
-
-        discardRecordingButton.addEventListener('click', () => {
-            audioBlob = null;
-            uploadedAudioUrl = null;
-            audioModal.classList.add('hidden');
-            playbackState.classList.add('hidden');
-            playbackState.classList.remove('flex');
-            recordingState.classList.remove('hidden');
-        });
-
-        // ✅ Upload using new Base64 -> API method
-        saveRecordingButton.addEventListener('click', async () => {
-            if (!audioBlob) return;
-
-            // Show loading state and hide playback state
-            playbackState.classList.add('hidden');
-            playbackState.classList.remove('flex');
-            loadingState.classList.remove('hidden');
-            loadingState.classList.add('flex');
-            hideMessage();
-
-            try {
-                await uploadAudio(audioBlob); // use new helper function
-
-                if (uploadedAudioUrl) {
-                    showMessage('Audio recording saved and uploaded!', 'success');
-                    audioModal.classList.add('hidden');
-                    audioFileIndicator.classList.remove('hidden');
-                    audioInputContainer.classList.add('hidden');
-                } else {
-                    throw new Error('Upload failed');
+                const name = nameInput.value || 'Anonymous';
+                const textTestimony = textTestimonyInput.value;
+                
+                if (textTestimony.trim() === '') {
+                    showMessage('Please write your testimony before submitting.', 'error');
+                    return;
                 }
-            } catch (error) {
-                console.error('Error uploading audio:', error);
-                showMessage('Failed to upload audio. Please try again.', 'error');
-                // Show playback controls again on error
-                playbackState.classList.remove('hidden');
-                playbackState.classList.add('flex');
-            } finally {
-                // Hide loading state regardless of success or failure
-                loadingState.classList.add('hidden');
-                loadingState.classList.remove('flex');
-            }
+                
+                const whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}`;
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                const phoneNumber = '254757961229'; // Your WhatsApp number with country code
+                
+                window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                
+                showMessage('Thank you for sharing your testimony! You will now be redirected to WhatsApp.', 'success');
+
+                // Reset form state
+                testimonyForm.reset();
+            });
         });
-
-        removeAudioButton.addEventListener('click', () => {
-            audioBlob = null;
-            uploadedAudioUrl = null;
-            audioFileIndicator.classList.add('hidden');
-            audioInputContainer.classList.remove('hidden');
-            showMessage('Audio testimony removed.', 'warning');
-        });
-        
-        // ✅ WhatsApp submit
-        testimonyForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            hideMessage();
-
-            const name = nameInput.value || 'Anonymous';
-            const textTestimony = textTestimonyInput.value;
-            
-            if (!uploadedAudioUrl && textTestimony.trim() === '') {
-                showMessage('Please write or record a testimony before submitting.', 'error');
-                return;
-            }
-            
-            let whatsappMessage;
-            if (uploadedAudioUrl) {
-                whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}\n\nListen to the audio here: ${uploadedAudioUrl}`;
-            } else {
-                whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}`;
-            }
-
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-            const phoneNumber = '254757961229'; // Your WhatsApp number with country code
-            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-            
-            showMessage('Thank you for sharing your testimony! You will now be redirected to WhatsApp.', 'success');
-
-            // Reset form state
-            testimonyForm.reset();
-            audioBlob = null;
-            uploadedAudioUrl = null;
-            audioFileIndicator.classList.add('hidden');
-            audioInputContainer.classList.remove('hidden');
-        });
-
-        // ✅ New upload helper function
-        // Replace old file.io / @vercel/blob upload with:
-        async function uploadAudio(blob) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = async () => {
-                const base64Data = reader.result.split(",")[1]; // strip header
-                const res = await fetch("/api/upload-audio", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ file: base64Data })
-                });
-                const data = await res.json();
-                if (data.url) {
-                    uploadedAudioUrl = data.url;
-                }
-            };
-        }
-    });
-</script>
-
+    </script>
 </body>
 </html>
