@@ -1,5 +1,5 @@
 export const config = {
-  runtime: "nodejs",
+  runtime: "nodejs18.x", // Force Node.js runtime, not Edge
 };
 
 import { put } from "@vercel/blob";
@@ -7,18 +7,24 @@ import { put } from "@vercel/blob";
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
-      const file = req.body; // frontend sends file as base64 string
-      const buffer = Buffer.from(file, "base64");
+      // Convert request body into a buffer
+      const chunks = [];
+      for await (const chunk of req) {
+        chunks.push(chunk);
+      }
+      const fileBuffer = Buffer.concat(chunks);
 
-      const blob = await put(`audio-${Date.now()}.webm`, buffer, {
+      // Save blob to Vercel Blob Storage
+      const blob = await put(`uploads/${Date.now()}.wav`, fileBuffer, {
         access: "public",
       });
 
-      res.status(200).json({ url: blob.url });
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+      return res.status(200).json({ url: blob.url });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Upload failed" });
     }
   } else {
-    res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
 }
