@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testimonies of Faith</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -19,8 +19,8 @@
         }
 
         @keyframes showMessage {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(-100%); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Modal styles */
@@ -53,9 +53,27 @@
                 opacity: 1;
             }
         }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #6d28d9;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Message Box at the top of the screen -->
+    <div id="messageBox" class="fixed top-0 left-0 right-0 z-50 transform -translate-y-full transition-transform duration-300 ease-out">
+        <div class="px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto"></div>
+    </div>
 
     <!-- Main Container -->
     <div class="w-full max-w-5xl h-auto md:h-[80vh] bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden">
@@ -127,7 +145,6 @@
                 <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-150 ease-in-out transform hover:scale-105">
                     Share My Testimony
                 </button>
-                <div id="messageBox" class="hidden p-4 mt-4 rounded-lg text-sm font-medium text-center" role="alert"></div>
             </form>
         </div>
     </div>
@@ -135,6 +152,7 @@
     <!-- Audio Recording Modal -->
     <div id="audioModal" class="modal-overlay hidden">
         <div class="modal-content">
+            <!-- Recording State -->
             <div id="recordingState" class="flex flex-col items-center">
                 <svg class="h-16 w-16 text-purple-600 mb-4 animate-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.5-3c0 3.53-2.64 6.44-6.2 6.93V21h-1.6c-1.1 0-2 .9-2 2h6c0-1.1-.9-2-2-2h-1.6v-3.07C9.14 17.44 6.5 14.53 6.5 11h2c0 2.22 1.78 4 4 4s4-1.78 4-4h2.5z"/>
@@ -145,6 +163,7 @@
                 </button>
             </div>
 
+            <!-- Playback State -->
             <div id="playbackState" class="hidden flex-col items-center">
                 <p class="text-xl font-semibold text-gray-800 mb-4">Your Recording</p>
                 <audio id="audioPlayback" controls class="mb-4 w-full"></audio>
@@ -157,16 +176,24 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden flex-col items-center">
+                <div class="spinner mb-4"></div>
+                <p class="text-xl font-semibold text-gray-800">Uploading...</p>
+            </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const messageBox = document.getElementById('messageBox');
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            const messageBoxContainer = document.getElementById('messageBox');
+            const messageBox = messageBoxContainer.querySelector('div');
             const audioButton = document.getElementById('audioButton');
             const audioModal = document.getElementById('audioModal');
             const recordingState = document.getElementById('recordingState');
             const playbackState = document.getElementById('playbackState');
+            const loadingState = document.getElementById('loadingState');
             const stopRecordingButton = document.getElementById('stopRecording');
             const discardRecordingButton = document.getElementById('discardRecording');
             const saveRecordingButton = document.getElementById('saveRecording');
@@ -181,29 +208,39 @@
             let mediaRecorder;
             let audioChunks = [];
             let audioBlob = null;
+            let uploadedAudioUrl = null;
 
-            // Function to show a message in the message box
-            function showMessage(message, classes) {
+            // ✅ Show message
+            function showMessage(message, type) {
+                let classes = '';
+                if (type === 'success') {
+                    classes = 'bg-green-100 text-green-700 border-green-200';
+                } else if (type === 'error') {
+                    classes = 'bg-red-100 text-red-700 border-red-200';
+                } else if (type === 'warning') {
+                    classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
+                }
+
                 messageBox.textContent = message;
-                messageBox.className = classes + ' p-4 mt-4 rounded-lg text-sm font-medium text-center show-message';
-                messageBox.classList.remove('hidden');
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 5000); // Hide after 5 seconds
+                messageBox.className = classes + ' px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto';
+                messageBoxContainer.classList.remove('-translate-y-full');
             }
 
-            // Audio recording logic
+            function hideMessage() {
+                messageBoxContainer.classList.add('-translate-y-full');
+            }
+
+            // ✅ Audio recording logic
             audioButton.addEventListener('click', async () => {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
                     audioBlob = null;
+                    uploadedAudioUrl = null;
+                    hideMessage();
 
-                    mediaRecorder.ondataavailable = event => {
-                        audioChunks.push(event.data);
-                    };
-
+                    mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
                     mediaRecorder.onstop = () => {
                         audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                         const audioUrl = URL.createObjectURL(audioBlob);
@@ -217,111 +254,112 @@
 
                     mediaRecorder.start();
                     audioModal.classList.remove('hidden');
-                    console.log('Audio recording started...');
                 } catch (error) {
-                    console.error('Error accessing microphone:', error);
-                    showMessage('Microphone access denied or not available. Please allow access to record.', 'bg-red-100 text-red-700 border-red-200');
+                    console.error('Microphone error:', error);
+                    showMessage('Microphone access denied.', 'error');
                 }
             });
 
             stopRecordingButton.addEventListener('click', () => {
                 if (mediaRecorder && mediaRecorder.state === 'recording') {
                     mediaRecorder.stop();
-                    console.log('Audio recording stopped.');
                 }
             });
 
             discardRecordingButton.addEventListener('click', () => {
-                // Clear state and hide modal
                 audioBlob = null;
+                uploadedAudioUrl = null;
                 audioModal.classList.add('hidden');
                 playbackState.classList.add('hidden');
                 playbackState.classList.remove('flex');
                 recordingState.classList.remove('hidden');
-                console.log('Audio recording discarded.');
             });
 
-            saveRecordingButton.addEventListener('click', () => {
-                console.log('Audio recording saved:', audioBlob);
-                audioModal.classList.add('hidden');
-                audioFileIndicator.classList.remove('hidden');
-                audioInputContainer.classList.add('hidden');
-                
+            // ✅ Upload to Vercel Serverless Function
+            saveRecordingButton.addEventListener('click', async () => {
+                if (!audioBlob) return;
+
+                // Show loading state and hide playback state
                 playbackState.classList.add('hidden');
                 playbackState.classList.remove('flex');
-                recordingState.classList.remove('hidden');
-                showMessage('Audio recording saved successfully!', 'bg-green-100 text-green-700 border-green-200');
+                loadingState.classList.remove('hidden');
+                loadingState.classList.add('flex');
+                hideMessage();
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, `testimony-${Date.now()}.wav`);
+
+                    // Fetch request to the Vercel Serverless Function
+                    const response = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        uploadedAudioUrl = result.url;
+                        console.log('Audio uploaded successfully. URL:', uploadedAudioUrl);
+                        showMessage('Audio recording saved and uploaded!', 'success');
+                        audioModal.classList.add('hidden');
+                        audioFileIndicator.classList.remove('hidden');
+                        audioInputContainer.classList.add('hidden');
+                    } else {
+                        throw new Error(result.error || 'Upload failed');
+                    }
+                } catch (error) {
+                    console.error('Error uploading audio:', error);
+                    showMessage('Failed to upload audio. Please try again.', 'error');
+                    // Show playback controls again on error
+                    playbackState.classList.remove('hidden');
+                    playbackState.classList.add('flex');
+                } finally {
+                    // Hide loading state regardless of success or failure
+                    loadingState.classList.add('hidden');
+                    loadingState.classList.remove('flex');
+                }
             });
 
             removeAudioButton.addEventListener('click', () => {
                 audioBlob = null;
+                uploadedAudioUrl = null;
                 audioFileIndicator.classList.add('hidden');
                 audioInputContainer.classList.remove('hidden');
-                showMessage('Audio testimony removed.', 'bg-yellow-100 text-yellow-700 border-yellow-200');
+                showMessage('Audio testimony removed.', 'warning');
             });
             
-            // Form submission logic
-            testimonyForm.addEventListener('submit', async function(e) {
+            // ✅ WhatsApp submit
+            testimonyForm.addEventListener('submit', function(e) {
                 e.preventDefault();
+                hideMessage();
 
                 const name = nameInput.value || 'Anonymous';
                 const textTestimony = textTestimonyInput.value;
                 
-                if (audioBlob || textTestimony.trim() !== '') {
-                    console.log('Form Submitted with:', { name: name, text: textTestimony, audio: audioBlob });
-                    
-                    if (audioBlob) {
-                        const message = `Testimony from ${name}.\n\n${textTestimony}`;
-                        if (navigator.share) {
-                            // Use Web Share API for native sharing
-                            const audioFile = new File([audioBlob], 'my_testimony.wav', { type: 'audio/wav' });
-                            try {
-                                await navigator.share({
-                                    files: [audioFile],
-                                    title: `Testimony from ${name}`,
-                                    text: message
-                                });
-                                showMessage('Your audio testimony has been shared!', 'bg-green-100 text-green-700 border-green-200');
-                            } catch (error) {
-                                console.error('Error sharing:', error);
-                                showMessage('Sharing failed. Please try again.', 'bg-red-100 text-red-700 border-red-200');
-                            }
-                        } else {
-                            // Fallback for browsers that don't support Web Share API
-                            const audioUrl = URL.createObjectURL(audioBlob);
-                            const a = document.createElement('a');
-                            a.style.display = 'none';
-                            a.href = audioUrl;
-                            a.download = 'testimony_' + Date.now() + '.wav';
-                            document.body.appendChild(a);
-                            a.click();
-                            
-                            // URL-encode the message
-                            const encodedMessage = encodeURIComponent(message);
-                            const phoneNumber = '254757961229'; // Your WhatsApp number with country code
-
-                            // Open WhatsApp with a pre-filled message and your number
-                            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-                            
-                            // Clean up the temporary link and URL
-                            window.URL.revokeObjectURL(audioUrl);
-                            document.body.removeChild(a);
-                            
-
-                            showMessage('Your audio is downloading. Please share the file on WhatsApp.', 'bg-green-100 text-green-700 border-green-200');
-                        }
-                    } else {
-                        showMessage('Thank you for sharing your testimony! It has been submitted successfully.', 'bg-green-100 text-green-700 border-green-200');
-                    }
-
-                    testimonyForm.reset();
-                    audioBlob = null; // Reset for next submission
-                    audioFileIndicator.classList.add('hidden');
-                    audioInputContainer.classList.remove('hidden');
-
-                } else {
-                    showMessage('Please write or record a testimony before submitting.', 'bg-red-100 text-red-700 border-red-200');
+                if (!uploadedAudioUrl && textTestimony.trim() === '') {
+                    showMessage('Please write or record a testimony before submitting.', 'error');
+                    return;
                 }
+                
+                let whatsappMessage;
+                if (uploadedAudioUrl) {
+                    whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}\n\nListen to the audio here: ${uploadedAudioUrl}`;
+                } else {
+                    whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}`;
+                }
+
+                const encodedMessage = encodeURIComponent(whatsappMessage);
+                const phoneNumber = '254757961229'; // Your WhatsApp number with country code
+                window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                
+                showMessage('Thank you for sharing your testimony! You will now be redirected to WhatsApp.', 'success');
+
+                // Reset form state
+                testimonyForm.reset();
+                audioBlob = null;
+                uploadedAudioUrl = null;
+                audioFileIndicator.classList.add('hidden');
+                audioInputContainer.classList.remove('hidden');
             });
         });
     </script>
