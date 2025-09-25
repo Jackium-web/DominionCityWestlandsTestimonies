@@ -1,0 +1,8 @@
+{
+  "name": "dominions-testimonies",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node api/upload-audio.js"
+  }
+}
