@@ -186,182 +186,200 @@
     </div>
 
     <script type="module">
-        document.addEventListener('DOMContentLoaded', async () => {
-            const messageBoxContainer = document.getElementById('messageBox');
-            const messageBox = messageBoxContainer.querySelector('div');
-            const audioButton = document.getElementById('audioButton');
-            const audioModal = document.getElementById('audioModal');
-            const recordingState = document.getElementById('recordingState');
-            const playbackState = document.getElementById('playbackState');
-            const loadingState = document.getElementById('loadingState');
-            const stopRecordingButton = document.getElementById('stopRecording');
-            const discardRecordingButton = document.getElementById('discardRecording');
-            const saveRecordingButton = document.getElementById('saveRecording');
-            const audioPlayback = document.getElementById('audioPlayback');
-            const audioFileIndicator = document.getElementById('audioFileIndicator');
-            const removeAudioButton = document.getElementById('removeAudio');
-            const audioInputContainer = document.getElementById('audioInputContainer');
-            const nameInput = document.getElementById('name');
-            const textTestimonyInput = document.getElementById('textTestimony');
-            const testimonyForm = document.getElementById('testimonyForm');
-            
-            let mediaRecorder;
-            let audioChunks = [];
-            let audioBlob = null;
-            let uploadedAudioUrl = null;
+    document.addEventListener('DOMContentLoaded', async () => {
+        const messageBoxContainer = document.getElementById('messageBox');
+        const messageBox = messageBoxContainer.querySelector('div');
+        const audioButton = document.getElementById('audioButton');
+        const audioModal = document.getElementById('audioModal');
+        const recordingState = document.getElementById('recordingState');
+        const playbackState = document.getElementById('playbackState');
+        const loadingState = document.getElementById('loadingState');
+        const stopRecordingButton = document.getElementById('stopRecording');
+        const discardRecordingButton = document.getElementById('discardRecording');
+        const saveRecordingButton = document.getElementById('saveRecording');
+        const audioPlayback = document.getElementById('audioPlayback');
+        const audioFileIndicator = document.getElementById('audioFileIndicator');
+        const removeAudioButton = document.getElementById('removeAudio');
+        const audioInputContainer = document.getElementById('audioInputContainer');
+        const nameInput = document.getElementById('name');
+        const textTestimonyInput = document.getElementById('textTestimony');
+        const testimonyForm = document.getElementById('testimonyForm');
+        
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob = null;
+        let uploadedAudioUrl = null;
 
-            // ✅ Show message
-            function showMessage(message, type) {
-                let classes = '';
-                if (type === 'success') {
-                    classes = 'bg-green-100 text-green-700 border-green-200';
-                } else if (type === 'error') {
-                    classes = 'bg-red-100 text-red-700 border-red-200';
-                } else if (type === 'warning') {
-                    classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
-                }
-
-                messageBox.textContent = message;
-                messageBox.className = classes + ' px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto';
-                messageBoxContainer.classList.remove('-translate-y-full');
+        // ✅ Show message
+        function showMessage(message, type) {
+            let classes = '';
+            if (type === 'success') {
+                classes = 'bg-green-100 text-green-700 border-green-200';
+            } else if (type === 'error') {
+                classes = 'bg-red-100 text-red-700 border-red-200';
+            } else if (type === 'warning') {
+                classes = 'bg-yellow-100 text-yellow-700 border-yellow-200';
             }
 
-            function hideMessage() {
-                messageBoxContainer.classList.add('-translate-y-full');
-            }
+            messageBox.textContent = message;
+            messageBox.className = classes + ' px-4 py-3 text-sm font-medium text-center shadow-lg rounded-b-lg w-full max-w-lg mx-auto';
+            messageBoxContainer.classList.remove('-translate-y-full');
+        }
 
-            // ✅ Audio recording logic
-            audioButton.addEventListener('click', async () => {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    audioBlob = null;
-                    uploadedAudioUrl = null;
-                    hideMessage();
+        function hideMessage() {
+            messageBoxContainer.classList.add('-translate-y-full');
+        }
 
-                    mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
-                    mediaRecorder.onstop = () => {
-                        audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                        audioPlayback.src = audioUrl;
-
-                        // Switch to playback state
-                        recordingState.classList.add('hidden');
-                        playbackState.classList.remove('hidden');
-                        playbackState.classList.add('flex');
-                    };
-
-                    mediaRecorder.start();
-                    audioModal.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Microphone error:', error);
-                    showMessage('Microphone access denied.', 'error');
-                }
-            });
-
-            stopRecordingButton.addEventListener('click', () => {
-                if (mediaRecorder && mediaRecorder.state === 'recording') {
-                    mediaRecorder.stop();
-                }
-            });
-
-            discardRecordingButton.addEventListener('click', () => {
+        // ✅ Audio recording logic
+        audioButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
                 audioBlob = null;
                 uploadedAudioUrl = null;
-                audioModal.classList.add('hidden');
-                playbackState.classList.add('hidden');
-                playbackState.classList.remove('flex');
-                recordingState.classList.remove('hidden');
-            });
-
-            // ✅ Upload to Vercel Serverless Function
-            saveRecordingButton.addEventListener('click', async () => {
-                if (!audioBlob) return;
-
-                // Show loading state and hide playback state
-                playbackState.classList.add('hidden');
-                playbackState.classList.remove('flex');
-                loadingState.classList.remove('hidden');
-                loadingState.classList.add('flex');
                 hideMessage();
 
-                try {
-                    const formData = new FormData();
-                    formData.append('file', audioBlob, `testimony-${Date.now()}.wav`);
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayback.src = audioUrl;
 
-                    // Fetch request to the Vercel Serverless Function
-                    const response = await fetch('/api/upload', {
-                        method: 'POST',
-                        body: formData,
-                    });
-
-                    const result = await response.json();
-                    if (response.ok && result.success) {
-                        uploadedAudioUrl = result.url;
-                        console.log('Audio uploaded successfully. URL:', uploadedAudioUrl);
-                        showMessage('Audio recording saved and uploaded!', 'success');
-                        audioModal.classList.add('hidden');
-                        audioFileIndicator.classList.remove('hidden');
-                        audioInputContainer.classList.add('hidden');
-                    } else {
-                        throw new Error(result.error || 'Upload failed');
-                    }
-                } catch (error) {
-                    console.error('Error uploading audio:', error);
-                    showMessage('Failed to upload audio. Please try again.', 'error');
-                    // Show playback controls again on error
+                    // Switch to playback state
+                    recordingState.classList.add('hidden');
                     playbackState.classList.remove('hidden');
                     playbackState.classList.add('flex');
-                } finally {
-                    // Hide loading state regardless of success or failure
-                    loadingState.classList.add('hidden');
-                    loadingState.classList.remove('flex');
-                }
-            });
+                };
 
-            removeAudioButton.addEventListener('click', () => {
-                audioBlob = null;
-                uploadedAudioUrl = null;
-                audioFileIndicator.classList.add('hidden');
-                audioInputContainer.classList.remove('hidden');
-                showMessage('Audio testimony removed.', 'warning');
-            });
-            
-            // ✅ WhatsApp submit
-            testimonyForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                hideMessage();
-
-                const name = nameInput.value || 'Anonymous';
-                const textTestimony = textTestimonyInput.value;
-                
-                if (!uploadedAudioUrl && textTestimony.trim() === '') {
-                    showMessage('Please write or record a testimony before submitting.', 'error');
-                    return;
-                }
-                
-                let whatsappMessage;
-                if (uploadedAudioUrl) {
-                    whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}\n\nListen to the audio here: ${uploadedAudioUrl}`;
-                } else {
-                    whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}`;
-                }
-
-                const encodedMessage = encodeURIComponent(whatsappMessage);
-                const phoneNumber = '254757961229'; // Your WhatsApp number with country code
-                window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-                
-                showMessage('Thank you for sharing your testimony! You will now be redirected to WhatsApp.', 'success');
-
-                // Reset form state
-                testimonyForm.reset();
-                audioBlob = null;
-                uploadedAudioUrl = null;
-                audioFileIndicator.classList.add('hidden');
-                audioInputContainer.classList.remove('hidden');
-            });
+                mediaRecorder.start();
+                audioModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Microphone error:', error);
+                showMessage('Microphone access denied.', 'error');
+            }
         });
-    </script>
+
+        stopRecordingButton.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+        });
+
+        discardRecordingButton.addEventListener('click', () => {
+            audioBlob = null;
+            uploadedAudioUrl = null;
+            audioModal.classList.add('hidden');
+            playbackState.classList.add('hidden');
+            playbackState.classList.remove('flex');
+            recordingState.classList.remove('hidden');
+        });
+
+        // ✅ Upload using new Base64 -> API method
+        saveRecordingButton.addEventListener('click', async () => {
+            if (!audioBlob) return;
+
+            // Show loading state and hide playback state
+            playbackState.classList.add('hidden');
+            playbackState.classList.remove('flex');
+            loadingState.classList.remove('hidden');
+            loadingState.classList.add('flex');
+            hideMessage();
+
+            try {
+                await uploadAudio(audioBlob); // use new helper function
+
+                if (uploadedAudioUrl) {
+                    showMessage('Audio recording saved and uploaded!', 'success');
+                    audioModal.classList.add('hidden');
+                    audioFileIndicator.classList.remove('hidden');
+                    audioInputContainer.classList.add('hidden');
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                console.error('Error uploading audio:', error);
+                showMessage('Failed to upload audio. Please try again.', 'error');
+                // Show playback controls again on error
+                playbackState.classList.remove('hidden');
+                playbackState.classList.add('flex');
+            } finally {
+                // Hide loading state regardless of success or failure
+                loadingState.classList.add('hidden');
+                loadingState.classList.remove('flex');
+            }
+        });
+
+        removeAudioButton.addEventListener('click', () => {
+            audioBlob = null;
+            uploadedAudioUrl = null;
+            audioFileIndicator.classList.add('hidden');
+            audioInputContainer.classList.remove('hidden');
+            showMessage('Audio testimony removed.', 'warning');
+        });
+        
+        // ✅ WhatsApp submit
+        testimonyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            hideMessage();
+
+            const name = nameInput.value || 'Anonymous';
+            const textTestimony = textTestimonyInput.value;
+            
+            if (!uploadedAudioUrl && textTestimony.trim() === '') {
+                showMessage('Please write or record a testimony before submitting.', 'error');
+                return;
+            }
+            
+            let whatsappMessage;
+            if (uploadedAudioUrl) {
+                whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}\n\nListen to the audio here: ${uploadedAudioUrl}`;
+            } else {
+                whatsappMessage = `Testimony from ${name}:\n\n${textTestimony}`;
+            }
+
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            const phoneNumber = '254757961229'; // Your WhatsApp number with country code
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+            
+            showMessage('Thank you for sharing your testimony! You will now be redirected to WhatsApp.', 'success');
+
+            // Reset form state
+            testimonyForm.reset();
+            audioBlob = null;
+            uploadedAudioUrl = null;
+            audioFileIndicator.classList.add('hidden');
+            audioInputContainer.classList.remove('hidden');
+        });
+
+        // ✅ New upload helper function
+        async function uploadAudio(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = async () => {
+                    try {
+                        const base64Data = reader.result.split(",")[1]; // strip header
+                        const res = await fetch("/api/upload-audio", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ file: base64Data })
+                        });
+                        const data = await res.json();
+                        if (data.url) {
+                            uploadedAudioUrl = data.url; // use in WhatsApp message
+                            resolve();
+                        } else {
+                            reject(new Error(data.error || "Upload failed"));
+                        }
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+            });
+        }
+    });
+</script>
+
 </body>
 </html>
