@@ -55,7 +55,7 @@
             <h2 class="text-3xl font-bold mb-6 text-gray-800 text-center">Write Your Testimony</h2>
             
             <!-- Testimony Form -->
-            <form id="waForm" class="space-y-4 mb-8">
+            <form id="testimonyForm" class="space-y-4 mb-8">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Your Name (Optional)</label>
                     <input type="text" id="name" name="name" placeholder="John Doe" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-150 ease-in-out">
@@ -70,35 +70,36 @@
                 <div id="messageBox" class="hidden p-4 mt-4 rounded-lg text-sm font-medium text-center" role="alert"></div>
             </form>
 
-            
+            <p id="status"></p>
         </div>
     </div>
 
     <script>
-
-     document.getElementById("waForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    document.getElementById("testimonyForm").addEventListener("submit", function(e) {
+    //   e.preventDefault();
 
       const name = this.name.value;
-      const message = this.message.value;
+      const message = this.testimony.value;
 
       // Replace with your WhatsApp number
       const phone = "254757961229";  
 
       const url = `https://wa.me/${phone}?text=${encodeURIComponent(
-        "From: " + name + "\nMessage: " + message
+        `From: ${name} 
+        \nMessage:  ${message}`
       )}`;
 
       // Redirect user to WhatsApp
       window.open(url, "_blank");
     });
+     
 
 
         document.addEventListener('DOMContentLoaded', () => {
             const messageBox = document.getElementById('messageBox');
 
             document.getElementById('testimonyForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+                //e.preventDefault();
 
                 const name = document.getElementById('name').value || 'Anonymous';
                 const testimony = document.getElementById('testimony').value;
