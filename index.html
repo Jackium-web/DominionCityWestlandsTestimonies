@@ -70,27 +70,28 @@
                 <div id="messageBox" class="hidden p-4 mt-4 rounded-lg text-sm font-medium text-center" role="alert"></div>
             </form>
 
-            <p id="status"></p>
+            
         </div>
     </div>
 
     <script>
 
-        document.getElementById("waForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
+     document.getElementById("waForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-            const res = await fetch("/api/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            });
+      const name = this.name.value;
+      const message = this.message.value;
 
-            const result = await res.json();
-            document.getElementById("status").textContent = result.message;
-        });
+      // Replace with your WhatsApp number
+      const phone = "254757961229";  
 
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(
+        "From: " + name + "\nMessage: " + message
+      )}`;
+
+      // Redirect user to WhatsApp
+      window.open(url, "_blank");
+    });
 
 
         document.addEventListener('DOMContentLoaded', () => {
