@@ -1,16 +1,20 @@
 import { put } from "@vercel/blob";
 
-export const config = {
-  runtime: "edge",
-};
+export default async function handler(req, res) {
+  if (req.method === "POST") {
+    try {
+      const file = req.body; // frontend sends file as base64 string
+      const buffer = Buffer.from(file, "base64");
 
-export default async function handler(req) {
-  const blob = await req.blob();
-  const { url } = await put(`testimonies/${Date.now()}.wav`, blob, {
-    access: "public",
-  });
+      const blob = await put(`audio-${Date.now()}.webm`, buffer, {
+        access: "public",
+      });
 
-  return new Response(JSON.stringify({ url }), {
-    headers: { "Content-Type": "application/json" },
-  });
+      res.status(200).json({ url: blob.url });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  } else {
+    res.status(405).json({ error: "Method not allowed" });
+  }
 }
