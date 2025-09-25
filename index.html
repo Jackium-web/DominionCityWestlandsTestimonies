@@ -353,30 +353,22 @@
         });
 
         // ✅ New upload helper function
+        // Replace old file.io / @vercel/blob upload with:
         async function uploadAudio(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = async () => {
-                    try {
-                        const base64Data = reader.result.split(",")[1]; // strip header
-                        const res = await fetch("/api/upload-audio", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ file: base64Data })
-                        });
-                        const data = await res.json();
-                        if (data.url) {
-                            uploadedAudioUrl = data.url; // use in WhatsApp message
-                            resolve();
-                        } else {
-                            reject(new Error(data.error || "Upload failed"));
-                        }
-                    } catch (err) {
-                        reject(err);
-                    }
-                };
-            });
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+                const base64Data = reader.result.split(",")[1]; // strip header
+                const res = await fetch("/api/upload-audio", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ file: base64Data })
+                });
+                const data = await res.json();
+                if (data.url) {
+                    uploadedAudioUrl = data.url;
+                }
+            };
         }
     });
 </script>
