@@ -4,5 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "node api/upload-audio.js"
+  },
+  "dependencies": {
+    "fs-extra": "^11.1.1"
   }
 }
