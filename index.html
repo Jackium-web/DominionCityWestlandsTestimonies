@@ -49,7 +49,7 @@
                 </p>
             </div>
             <div class="relative z-20 mt-auto">
-                <p class="text-xs opacity-70 mt-4">&copy; 2024 Church of Faith. All Rights Reserved.</p>
+                <p class="text-xs opacity-70 mt-4">&copy; <span id='current_year'></span> Dominion City Westlands . All Rights Reserved.</p>
             </div>
         </div>
 
@@ -132,6 +132,9 @@
                 testimonyForm.reset();
             });
         });
+
+        const currentYear = new Date().getFullYear();
+        document.getElementById("current_year").innerHTML(currentYear);
     </script>
 </body>
 </html>
